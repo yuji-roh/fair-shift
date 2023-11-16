@@ -22,7 +22,7 @@ The synthetic data contains training set and test set.
 To simulate our framework, please use the **jupyter notebook** in the directory.
 
 The jupyter notebook will load the data and train the models.
-We consider two scenarios: supporting (1) a single metric (DP) and (2) multiple metrics (DP & EO).
+We consider two scenarios: supporting (1) a single metric (demographic parity; DP) and (2) multiple metrics (demographic parity; DP & equalized odds; EO).
 
 Each training shows either in-processing-only baseline or our framework 
 (i.e., pre- + in-processing). Note that we use [FairBatch](https://arxiv.org/abs/2012.01696) [Roh et al., ICLR 2021] 

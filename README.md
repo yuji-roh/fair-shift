@@ -19,7 +19,7 @@ and the child directory containing 6 numpy files for synthetic data.
 The synthetic data contains training set and test set.
 
 ## Simulation
-To simulate FairBatch, please use the **jupyter notebook** in the directory.
+To simulate our framework, please use the **jupyter notebook** in the directory.
 
 The jupyter notebook will load the data and train the models.
 We consider two scenarios: supporting (1) a single metric (DP) and (2) multiple metrics (DP & EO).

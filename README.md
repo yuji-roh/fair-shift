@@ -43,6 +43,17 @@ in-processing technique [Roh et al., ICLR 2021] that adjusts batch ratios for fa
 The detailed explanations about each component have been written in the codes as comments.
 Thanks!
 
-
+## Reference
+```
+@inproceedings{pmlr-v202-roh23a,
+  title={Improving Fair Training under Correlation Shifts},
+  author={Yuji Roh and Kangwook Lee and Steven Euijong Whang and Changho Suh},
+  booktitle={Proceedings of the 40th International Conference on Machine Learning},
+  pages={29179--29209},
+  year={2023},
+  volume={202},
+  url={https://proceedings.mlr.press/v202/roh23a.html},
+}
+```
 
 

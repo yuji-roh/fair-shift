@@ -171,7 +171,6 @@ def test_model(model_, X, y, s1):
     Pr_y_hat_1_z_0 = float(torch.sum((prediction == 1)[z_0_mask])) / z_0
     Pr_y_hat_1_z_1 = float(torch.sum((prediction == 1)[z_1_mask])) / z_1
         
-    
     y_1_z_0_mask = (y == 1.0) & (s1 == 0.0)
     y_1_z_1_mask = (y == 1.0) & (s1 == 1.0)
     y_1_z_0 = int(torch.sum(y_1_z_0_mask))

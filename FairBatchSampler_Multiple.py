@@ -37,7 +37,7 @@ class CustomDataset(Dataset):
         
         return len(self.x)
 
- 
+
 class FairBatch(Sampler):
     """FairBatch (Sampler in DataLoader).
     
@@ -61,7 +61,6 @@ class FairBatch(Sampler):
         y_, z_, yz_len: Dictionaries containing the length information.
         S: A dictionary containing the default size of each class in a batch.
         lb1, lb2: (0~1) real numbers indicating the lambda values in FairBatch.
-
         
     """
     def __init__(self, model, x_tensor, y_tensor, z_tensor, batch_size, alpha, target_fairness, knob = 1, grid = [], replacement = False, seed = 0):
@@ -149,8 +148,7 @@ class FairBatch(Sampler):
         self.lb1 = (self.S[1,1])/(self.S[1,1]+(self.S[1,0]))
         self.lb2 = (self.S[-1,1])/(self.S[-1,1]+(self.S[-1,0]))
 
-    
-    
+  
     def adjust_lambda(self):
         """Adjusts the lambda values for FairBatch algorithm.
         
@@ -162,8 +160,7 @@ class FairBatch(Sampler):
         logit = self.model(self.x_data).squeeze()
 
         criterion = torch.nn.BCELoss(reduction = 'none')
-        
-                
+                    
         if self.fairness_type == 'eqopp':
             
             yhat_yz = {}

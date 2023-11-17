@@ -385,8 +385,7 @@ class FairBatch(Sampler):
             Indices that indicate the data in each batch.
             
         """
-        
-        
+              
         if self.fairness_type == 'original':
             
             entire_index = torch.FloatTensor([i for i in range(len(self.y_data))])
@@ -397,7 +396,6 @@ class FairBatch(Sampler):
                 yield sort_index[i]
             
         else:
-            
             
             if self.fairness_type == 'grid':
                 each_size = {}

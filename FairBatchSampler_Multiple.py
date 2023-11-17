@@ -345,3 +345,40 @@ class FairBatch(Sampler):
                 self.lb2 = 1
             
     
+    def select_batch_replacement(self, batch_size, full_index, batch_num, replacement = False):
+        """Selects a certain number of batches based on the given batch size.
+        
+        Args: 
+            batch_size: An integer for the data size in a batch.
+            full_index: An array containing the candidate data indices.
+            batch_num: An integer indicating the number of batches.
+            replacement: A boolean indicating whether a batch consists of data with or without replacement.
+        
+        Returns:
+            Indices that indicate the data.
+            
+        """
+        
+        select_index = []
+        
+        if replacement == True:
+            for _ in range(batch_num):
+                select_index.append(np.random.choice(full_index, batch_size, replace = False))
+        else:
+            tmp_index = full_index.detach().cpu().numpy().copy()
+            random.shuffle(tmp_index)
+            
+            start_idx = 0
+            for i in range(batch_num):
+                if start_idx + batch_size > len(full_index):
+                    select_index.append(np.concatenate((tmp_index[start_idx:], tmp_index[ : batch_size - (len(full_index)-start_idx)])))
+                    
+                    start_idx = len(full_index)-start_idx
+                else:
+
+                    select_index.append(tmp_index[start_idx:start_idx + batch_size])
+                    start_idx += batch_size
+            
+        return select_index
+
+    

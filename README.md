@@ -31,6 +31,18 @@ The solver is defined in our program.
 Experiments are repeated 5 times each.
 After the training, the test accuracy and fairness will be shown.
 
+## Other details
+The two python files are models.py, utils.py, and FairBatchSampler_Multiple.py.
+The models.py contains a logistic regression architecture.
+The utils.py contains a total of three functions for 
+finding example weight, sampling data, and testing the model performances.
+The FairBatchSampler_Multiple.py contains two classes: CustomDataset and FairBatch. 
+CustomDataset class defines the dataset, and FairBatch class implements the state-of-the-art 
+in-processing technique [Roh et al., ICLR 2021] that adjusts batch ratios for fairness.
+
+The detailed explanations about each component have been written in the codes as comments.
+Thanks!
+
 
 
 

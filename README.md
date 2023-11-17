@@ -20,6 +20,9 @@ The synthetic data contains training set and test set.
 ## Simulation
 To simulate our framework, please use the **jupyter notebook** in the directory.
 
+The jupyter notebook will load the data and train the models.
+We consider two scenarios: supporting (1) a single metric (demographic parity; DP) and (2) multiple metrics (demographic parity; DP & equalized odds; EO).
+
 
 
 

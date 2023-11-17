@@ -57,9 +57,9 @@ class LogisticRegression(nn.Module):
             return layers
 
         self.model = nn.Sequential(
-            *block(3, 32, normalize=False),
-            nn.Linear(32, 1),
-            nn.Tanh()
+            # *block(3, 32, normalize=False),
+            # nn.Linear(32, 1),
+            # nn.Tanh()
             nn.Linear(n_in,n_out)
         )
 

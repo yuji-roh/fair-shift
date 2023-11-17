@@ -70,4 +70,72 @@ def correlation_reweighting(xz_data, y_data, z_data, w, w_new):
     return ex_weight
 
 
+def datasampling(xz_data, y_data, z_data, ex_weights, seed = 0):
+    """Samples the data according to the example weights.
+
+    Args:
+        xz_data: A torch tensor indicating the input features.
+        y_data: A torch tensor indicating the true label (1-D).
+        z_data: A torch tensor indicating the sensitive attribute (1-D).
+        ex_weights: A torch tensor indicating the example weights.
+        seed: An integer indicating the random seed.
+
+    Returns:
+        selected data examples.
+    """
+    
+    np.random.seed(seed)
+    
+    p_y1 = sum((y_data == 1.0).int()).float()/len(y_data)
+    p_y0 = sum((y_data == -1.0).int()).float()/len(y_data)
+    p_z1 = sum((z_data == 1.0).int()).float()/len(z_data)
+    p_z0 = sum((z_data == 0.0).int()).float()/len(z_data)
+    
+
+    # Takes the unique values of the tensors
+    z_item = list(set(z_data.tolist()))
+    y_item = list(set(y_data.tolist()))
+
+    yz_tuple = list(itertools.product(y_item, z_item))
+    
+    
+    # Makes masks
+    z_mask = {}
+    y_mask = {}
+    yz_mask = {}
+
+    for tmp_z in z_item:
+        z_mask[tmp_z] = (z_data == tmp_z)
+
+    for tmp_y in y_item:
+        y_mask[tmp_y] = (y_data == tmp_y)
+
+    for tmp_yz in yz_tuple:
+        yz_mask[tmp_yz] = (y_data == tmp_yz[0]) & (z_data == tmp_yz[1])
+    
+    
+    # Finds the original index
+    z_index = {}
+    y_index = {}
+    yz_index = {}
+        
+    for tmp_z in z_item:
+        z_index[tmp_z] = (z_mask[tmp_z] == 1).nonzero().squeeze()
+
+    for tmp_y in y_item:
+        y_index[tmp_y] = (y_mask[tmp_y] == 1).nonzero().squeeze()
+
+    for tmp_yz in yz_tuple:
+        yz_index[tmp_yz] = (yz_mask[tmp_yz] == 1).nonzero().squeeze()
+    
+    
+    # Selects the final index
+    selected_index = []
+    max_weight = max(ex_weights)
+    for tmp_yz in yz_tuple:
+        selected_index.extend(np.random.choice(yz_index[tmp_yz].cpu(), int(len(yz_index[tmp_yz]) * ex_weights[yz_index[tmp_yz][0]]/max_weight), replace=False))
+    
+    return selected_index
+
+
 

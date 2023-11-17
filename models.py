@@ -37,7 +37,6 @@ class LogisticRegression(nn.Module):
         
         super(LogisticRegression, self).__init__()
 
-    
         def block(in_feat, out_feat, normalize=True):
             """Defines a block with torch components.
             

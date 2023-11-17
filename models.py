@@ -24,6 +24,7 @@ def weights_init_normal(m):
         torch.nn.init.normal_(m.weight.data, 0.0, 0.2)
         torch.nn.init.constant_(m.bias.data, 0)
 
+
 class LogisticRegression(nn.Module):
     """Logistic Regression (classifier).
 

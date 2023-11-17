@@ -36,8 +36,8 @@ class CustomDataset(Dataset):
         """Returns the length of data."""
         
         return len(self.x)
-    
-    
+
+ 
 class FairBatch(Sampler):
     """FairBatch (Sampler in DataLoader).
     

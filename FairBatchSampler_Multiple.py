@@ -381,4 +381,91 @@ class FairBatch(Sampler):
             
         return select_index
 
-    
+    def __iter__(self):
+        """Iters the full process of FairBatch for serving the batches to training.
+        
+        Returns:
+            Indices that indicate the data in each batch.
+            
+        """
+        
+        
+        if self.fairness_type == 'original':
+            
+            entire_index = torch.FloatTensor([i for i in range(len(self.y_data))])
+            
+            sort_index = self.select_batch_replacement(self.batch_size, entire_index, self.batch_num, self.replacement)
+            
+            for i in range(self.batch_num):
+                yield sort_index[i]
+            
+        else:
+            
+            
+            if self.fairness_type == 'grid':
+                each_size = {}
+                each_size[(1,1)] = self.grid[(1,1)]
+                each_size[(1,0)] = self.grid[(1,1)]
+                each_size[(-1,1)] = self.grid[(-1,1)]
+                each_size[(-1,0)] = self.grid[(-1,0)]
+                
+            else:    
+                self.adjust_lambda() # Adjust the lambda values
+                each_size = {}
+                        
+                # Based on the updated lambdas, determine the size of each class in a batch
+                if self.fairness_type == 'eqopp':
+                    # lb1 * loss_z1 + (1-lb1) * loss_z0
+
+                    each_size[(1,1)] = round(self.lb1 * (self.S[(1,1)] + self.S[(1,0)]))
+                    each_size[(1,0)] = round((1-self.lb1) * (self.S[(1,1)] + self.S[(1,0)]))
+                    each_size[(-1,1)] = round(self.S[(-1,1)])
+                    each_size[(-1,0)] = round(self.S[(-1,0)])
+
+                elif self.fairness_type == 'eqodds':
+                    # lb1 * loss_y1z1 + (1-lb1) * loss_y1z0
+                    # lb2 * loss_y0z1 + (1-lb2) * loss_y0z0
+
+                    each_size[(1,1)] = round(self.lb1 * (self.S[(1,1)] + self.S[(1,0)]))
+                    each_size[(1,0)] = round((1-self.lb1) * (self.S[(1,1)] + self.S[(1,0)]))
+                    each_size[(-1,1)] = round(self.lb2 * (self.S[(-1,1)] + self.S[(-1,0)]))
+                    each_size[(-1,0)] = round((1-self.lb2) * (self.S[(-1,1)] + self.S[(-1,0)]))
+                    
+
+                elif self.fairness_type == 'dp':
+                    # lb1 * loss_y1z1 + (1-lb1) * loss_y1z0
+                    # lb2 * loss_y0z1 + (1-lb2) * loss_y0z0
+
+                    each_size[(1,1)] = round(self.lb1 * (self.S[(1,1)] + self.S[(1,0)]))
+                    each_size[(1,0)] = round((1-self.lb1) * (self.S[(1,1)] + self.S[(1,0)]))
+                    each_size[(-1,1)] = round(self.lb2 * (self.S[(-1,1)] + self.S[(-1,0)]))
+                    each_size[(-1,0)] = round((1-self.lb2) * (self.S[(-1,1)] + self.S[(-1,0)]))
+                    
+                elif self.fairness_type == 'dpeo':
+                    # lb1 * loss_y1z1 + (1-lb1) * loss_y1z0
+                    # lb2 * loss_y0z1 + (1-lb2) * loss_y0z0
+
+                    each_size[(1,1)] = round(self.lb1 * (self.S[(1,1)] + self.S[(1,0)]))
+                    each_size[(1,0)] = round((1-self.lb1) * (self.S[(1,1)] + self.S[(1,0)]))
+                    each_size[(-1,1)] = round(self.lb2 * (self.S[(-1,1)] + self.S[(-1,0)]))
+                    each_size[(-1,0)] = round((1-self.lb2) * (self.S[(-1,1)] + self.S[(-1,0)]))
+
+
+            # Get the indices for each class
+            sort_index_y_1_z_1 = self.select_batch_replacement(each_size[(1, 1)], self.yz_index[(1,1)], self.batch_num, self.replacement)
+            sort_index_y_0_z_1 = self.select_batch_replacement(each_size[(-1, 1)], self.yz_index[(-1,1)], self.batch_num, self.replacement)
+            sort_index_y_1_z_0 = self.select_batch_replacement(each_size[(1, 0)], self.yz_index[(1,0)], self.batch_num, self.replacement)
+            sort_index_y_0_z_0 = self.select_batch_replacement(each_size[(-1, 0)], self.yz_index[(-1,0)], self.batch_num, self.replacement)
+            
+                
+            for i in range(self.batch_num):
+                key_in_fairbatch = sort_index_y_0_z_0[i].copy()
+                key_in_fairbatch = np.hstack((key_in_fairbatch, sort_index_y_1_z_0[i].copy()))
+                key_in_fairbatch = np.hstack((key_in_fairbatch, sort_index_y_0_z_1[i].copy()))
+                key_in_fairbatch = np.hstack((key_in_fairbatch, sort_index_y_1_z_1[i].copy()))
+                             
+                random.shuffle(key_in_fairbatch)
+
+                yield key_in_fairbatch
+                               
+

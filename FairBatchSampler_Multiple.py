@@ -469,3 +469,9 @@ class FairBatch(Sampler):
                 yield key_in_fairbatch
                                
 
+    def __len__(self):
+        """Returns the length of data."""
+        
+        return len(self.y_data)
+
+    

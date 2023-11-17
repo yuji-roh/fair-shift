@@ -17,6 +17,9 @@ The directory contains a total of 5 files and 1 child directory:
 and the child directory containing 6 numpy files for synthetic data.
 The synthetic data contains training set and test set.
 
+## Simulation
+To simulate our framework, please use the **jupyter notebook** in the directory.
+
 
 
 

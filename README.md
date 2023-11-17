@@ -23,6 +23,14 @@ To simulate our framework, please use the **jupyter notebook** in the directory.
 The jupyter notebook will load the data and train the models.
 We consider two scenarios: supporting (1) a single metric (demographic parity; DP) and (2) multiple metrics (demographic parity; DP & equalized odds; EO).
 
+Each training shows either in-processing-only baseline or our framework 
+(i.e., pre- + in-processing). Note that we use [FairBatch](https://arxiv.org/abs/2012.01696) [Roh et al., ICLR 2021] 
+as the in-processing baseline that adaptively adjusts batch ratios for fairness.
+When using our pre-processing, we utilize a SDP solver to find the new data ratio. 
+The solver is defined in our program.
+Experiments are repeated 5 times each.
+After the training, the test accuracy and fairness will be shown.
+
 
 
 

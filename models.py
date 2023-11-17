@@ -77,7 +77,3 @@ class LogisticRegression(nn.Module):
         output = self.model(input_data)
         return output
     
-    
-
-
-

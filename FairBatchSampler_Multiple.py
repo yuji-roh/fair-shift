@@ -468,5 +468,3 @@ class FairBatch(Sampler):
         """Returns the length of data."""
         
         return len(self.y_data)
-
-    

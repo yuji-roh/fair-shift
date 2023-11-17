@@ -138,4 +138,80 @@ def datasampling(xz_data, y_data, z_data, ex_weights, seed = 0):
     return selected_index
 
 
+def test_model(model_, X, y, s1):
+    """Tests the performance of a model.
+
+    Args:
+        model_: A model to test.
+        X: Input features of test data.
+        y: True label (1-D) of test data.
+        s1: Sensitive attribute (1-D) of test data.
+
+    Returns:
+        The test accuracy and the fairness metrics of the model.
+    """
+    
+    model_.eval()
+    
+    y_hat = model_(X).squeeze()
+    prediction = (y_hat > 0.0).int().squeeze()
+    y = (y > 0.0).int()
+
+    z_0_mask = (s1 == 0.0)
+    z_1_mask = (s1 == 1.0)
+    z_0 = int(torch.sum(z_0_mask))
+    z_1 = int(torch.sum(z_1_mask))
+    
+    y_0_mask = (y == 0.0)
+    y_1_mask = (y == 1.0)
+    y_0 = int(torch.sum(y_0_mask))
+    y_1 = int(torch.sum(y_1_mask))
+    
+    Pr_y_hat_1 = float(torch.sum((prediction == 1))) / (z_0 + z_1)
+    
+    Pr_y_hat_1_z_0 = float(torch.sum((prediction == 1)[z_0_mask])) / z_0
+    Pr_y_hat_1_z_1 = float(torch.sum((prediction == 1)[z_1_mask])) / z_1
+        
+    
+    y_1_z_0_mask = (y == 1.0) & (s1 == 0.0)
+    y_1_z_1_mask = (y == 1.0) & (s1 == 1.0)
+    y_1_z_0 = int(torch.sum(y_1_z_0_mask))
+    y_1_z_1 = int(torch.sum(y_1_z_1_mask))
+    
+    Pr_y_hat_1_y_0 = float(torch.sum((prediction == 1)[y_0_mask])) / y_0
+    Pr_y_hat_1_y_1 = float(torch.sum((prediction == 1)[y_1_mask])) / y_1
+    
+    Pr_y_hat_1_y_1_z_0 = float(torch.sum((prediction == 1)[y_1_z_0_mask])) / y_1_z_0
+    Pr_y_hat_1_y_1_z_1 = float(torch.sum((prediction == 1)[y_1_z_1_mask])) / y_1_z_1
+    
+    y_0_z_0_mask = (y == 0.0) & (s1 == 0.0)
+    y_0_z_1_mask = (y == 0.0) & (s1 == 1.0)
+    y_0_z_0 = int(torch.sum(y_0_z_0_mask))
+    y_0_z_1 = int(torch.sum(y_0_z_1_mask))
+
+    Pr_y_hat_1_y_0_z_0 = float(torch.sum((prediction == 1)[y_0_z_0_mask])) / y_0_z_0
+    Pr_y_hat_1_y_0_z_1 = float(torch.sum((prediction == 1)[y_0_z_1_mask])) / y_0_z_1
+    
+    recall = Pr_y_hat_1_y_1
+    precision = float(torch.sum((prediction == 1)[y_1_mask])) / (int(torch.sum(prediction == 1)) +0.00001)
+    
+    y_hat_neq_y = float(torch.sum((prediction == y.int())))
+
+    test_acc = torch.sum(prediction == y.int()).float() / len(y)
+    test_f1 = 2 * recall * precision / (recall+precision+0.00001)
+    
+    min_dp = min(Pr_y_hat_1_z_0, Pr_y_hat_1_z_1) + 0.00001
+    max_dp = max(Pr_y_hat_1_z_0, Pr_y_hat_1_z_1) + 0.00001
+    min_eo_0 = min(Pr_y_hat_1_y_0_z_0, Pr_y_hat_1_y_0_z_1) + 0.00001
+    max_eo_0 = max(Pr_y_hat_1_y_0_z_0, Pr_y_hat_1_y_0_z_1) + 0.00001
+    min_eo_1 = min(Pr_y_hat_1_y_1_z_0, Pr_y_hat_1_y_1_z_1) + 0.00001
+    max_eo_1 = max(Pr_y_hat_1_y_1_z_0, Pr_y_hat_1_y_1_z_1) + 0.00001
+    
+    DP = max(abs(Pr_y_hat_1_z_0 - Pr_y_hat_1), abs(Pr_y_hat_1_z_1 - Pr_y_hat_1))
+    
+    EO_Y_0 = max(abs(Pr_y_hat_1_y_0_z_0 - Pr_y_hat_1_y_0), abs(Pr_y_hat_1_y_0_z_1 - Pr_y_hat_1_y_0))
+    EO_Y_1 = max(abs(Pr_y_hat_1_y_1_z_0 - Pr_y_hat_1_y_1), abs(Pr_y_hat_1_y_1_z_1 - Pr_y_hat_1_y_1))
+
+    
+    return {'Acc': test_acc.item(), 'DP_diff': DP, 'EO_Y0_diff': EO_Y_0, 'EO_Y1_diff': EO_Y_1, 'EqOdds_diff': max(EO_Y_0, EO_Y_1)}
 

@@ -52,7 +52,6 @@ def correlation_reweighting(xz_data, y_data, z_data, w, w_new):
     len_y0_z1 = sum(yz_mask[-1,1].int())
     len_y1_z1 = sum(yz_mask[1,1].int())
 
-
     ex_weight = []
 
     for i in range(len(y_data)):
